@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { OpenaiModule } from './openai/openai.module';
+import { RedisModule } from './infra/redis/redis.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { OpenaiModule } from './openai/openai.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    RedisModule,
     OpenaiModule,
   ],
   controllers: [AppController],
