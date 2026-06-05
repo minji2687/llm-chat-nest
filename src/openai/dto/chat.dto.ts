@@ -1,5 +1,6 @@
 export class ChatRequestDto {
   prompt: string;
+  sessionId: string;
 }
 
 export interface ChatResponse {
