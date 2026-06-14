@@ -1,6 +1,6 @@
 import { Body, Controller, Post, Logger } from '@nestjs/common';
 import { OpenaiService } from './openai.service';
-import { ChatRequestDto, ChatResponse } from './dto/chat.dto';
+import { ChatRequestDto, ChatResponse, EmbeddingRequestDto, EmbeddingResponse } from './dto/chat.dto';
 
 @Controller('openai')
 export class OpenaiController {
@@ -25,5 +25,10 @@ export class OpenaiController {
     });
 
     return result;
+  }
+
+  @Post('embedding')
+  async embedding(@Body() embeddingRequestDto: EmbeddingRequestDto): Promise<EmbeddingResponse> {
+    return this.openaiService.embedding(embeddingRequestDto);
   }
 }

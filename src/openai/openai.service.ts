@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { AxiosInstance } from 'axios';
-import { ChatRequestDto, ChatResponse } from './dto/chat.dto';
+import { ChatRequestDto, ChatResponse, EmbeddingRequestDto, EmbeddingResponse } from './dto/chat.dto';
 import { RedisService } from '../infra/redis/redis.service';
 
 const MAX_MESSAGES = 10;
@@ -31,6 +31,7 @@ export class OpenaiService {
       },
       timeout: 30000,
     });
+
   }
 
   async chat(chatRequestDto: ChatRequestDto): Promise<ChatResponse> {
@@ -80,6 +81,35 @@ export class OpenaiService {
       }
 
       this.logger.error({ action: 'chat_error', sessionId, error: '서버 오류가 발생했습니다' });
+      return { success: false, error: '서버 오류가 발생했습니다' };
+    }
+  }
+
+  async embedding(embeddingRequestDto: EmbeddingRequestDto): Promise<EmbeddingResponse> {
+    const { input } = embeddingRequestDto;
+
+    this.logger.log({ action: 'embedding_request', input });
+
+    try {
+      const response = await this.axiosInstance.post('/embeddings', {
+        model: 'text-embedding-3-small',
+        input,
+        encoding_format: 'float',
+      });
+
+      const embedding: number[] = response.data.data[0].embedding;
+
+      this.logger.log({ action: 'embedding_success', dimensions: embedding.length });
+
+      return { success: true, embedding };
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const errorMessage = error.response?.data?.error?.message || 'Embedding API 호출 중 오류가 발생했습니다';
+        this.logger.error({ action: 'embedding_error', error: errorMessage });
+        return { success: false, error: errorMessage };
+      }
+
+      this.logger.error({ action: 'embedding_error', error: '서버 오류가 발생했습니다' });
       return { success: false, error: '서버 오류가 발생했습니다' };
     }
   }

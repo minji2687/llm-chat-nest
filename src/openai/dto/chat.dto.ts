@@ -8,3 +8,13 @@ export interface ChatResponse {
   message?: string;
   error?: string;
 }
+
+export class EmbeddingRequestDto {
+  input: string;
+}
+
+export interface EmbeddingResponse {
+  success: boolean;
+  embedding?: number[];
+  error?: string;
+}
